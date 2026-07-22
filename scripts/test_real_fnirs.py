@@ -1,5 +1,13 @@
+import os
 import mne
 import matplotlib.pyplot as plt
+
+dataset_name = "ds004514"
+subject_id = "sub-01"
+
+output_dir = rf"F:\experiments\{dataset_name}\{subject_id}\fnirs"
+
+os.makedirs(output_dir, exist_ok=True)
 
 file_path = r"F:\ds004514_real\sub-01\nirs\sub-01_task-nirs_nirs.snirf"
 
@@ -28,6 +36,12 @@ plt.xlabel("Time (s)")
 plt.ylabel("Amplitude")
 
 plt.grid(True)
+
+save_path = os.path.join(output_dir, "real_fnirs_plot.png")
+
+plt.savefig(save_path, dpi=300)
+
+print(f"fNIRS plot saved at: {save_path}")
 
 plt.show()
 
