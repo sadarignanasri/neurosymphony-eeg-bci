@@ -88,7 +88,7 @@ class Recording:
 
 	def __post_init__(self) -> None:
 		"""Normalize common metadata after initialization."""
-		object.__setattr__(self, "recording_path", self.recording_path.expanduser().resolve())
+		object.__setattr__(self, "recording_path", self.recording_path.expanduser())
 		object.__setattr__(self, "subject_id", self.subject_id.strip())
 		object.__setattr__(self, "session_id", self._normalize_optional_token(self.session_id, "ses"))
 		object.__setattr__(self, "task_id", self._normalize_optional_token(self.task_id, "task"))
@@ -316,7 +316,7 @@ class RecordingManager:
 		session_id, run_id, task_id = self._extract_tokens(group_key)
 		modality = self._detect_group_modality(primary_files)
 		recording_name = self._derive_recording_name(primary_files, subject_info.subject_id)
-		recording_path = str(primary_files[0].path.resolve())
+		recording_path = str(primary_files[0].path)
 		is_valid, validation_errors = self._validate_recording(primary_files, files)
 
 		return RecordingInfo(

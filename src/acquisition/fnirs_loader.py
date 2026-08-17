@@ -178,22 +178,106 @@ class BaseFNIRSLoader(ABC):
     def _load_validated_recording(self, recording: Recording, validation: FNIRSValidationResult) -> FNIRSData:
         """Load fNIRS data after validation has passed."""
 
-    def _resolve_adapter(self, recording: Recording) -> tuple[BaseAdapter, AdapterContext]:
-        """Select the best adapter and resolve its metadata context."""
-        try:
-            adapter = self._adapter_factory.create_adapter(recording)
-        except Exception as exc:  # pragma: no cover - adapter framework errors are environment-specific
-            raise FNIRSAdapterError(f"Unable to select adapter for recording '{recording.recording_id}': {exc}") from exc
 
-        context = adapter.build_context(recording)
-        self._logger.debug(
-            "Resolved adapter '%s' for recording '%s' with layout=%s modality=%s",
-            adapter.adapter_name,
-            recording.recording_id,
-            context.layout.value,
-            context.modality.value,
-        )
-        return adapter, context
+    def _resolve_adapter(
+    self,
+    recording: Recording,
+    ) -> tuple[BaseAdapter, AdapterContext]:
+
+
+        try:
+            from src.acquisition.adapters.fnirs_adapter import FNIRSAdapter
+
+            # ----------------------------------------------------
+            # fNIRS recordings must use the fNIRS adapter.
+            # ----------------------------------------------------
+
+            if recording.modality not in {
+                RecordingModality.FNIRS,
+                RecordingModality.MULTIMODAL,
+            }:
+                raise FNIRSAdapterError(
+                    f"Cannot resolve fNIRS adapter for modality "
+                    f"'{recording.modality.value}'."
+                )
+
+            adapter = FNIRSAdapter()
+
+            # ----------------------------------------------------
+            # AdapterContext requires dataset/subject/recording
+            # metadata. Universal Recording does not expose every
+            # RecordingInfo field directly, so recover the values
+            # from Recording metadata where available.
+            # ----------------------------------------------------
+
+            metadata = dict(recording.metadata)
+
+            dataset_name = str(
+                metadata.get(
+                    "dataset_name",
+                    recording.recording_id.split("::")[0]
+                    if "::" in recording.recording_id
+                    else "unknown_dataset",
+                )
+            )
+
+            dataset_path_value = metadata.get(
+                "dataset_path",
+                recording.recording_path.parent,
+            )
+
+            subject_path_value = metadata.get(
+                "subject_path",
+                recording.recording_path.parent,
+            )
+
+            dataset_path = Path(
+                str(dataset_path_value)
+            ).expanduser()
+
+            subject_path = Path(
+                str(subject_path_value)
+            ).expanduser()
+
+            # ----------------------------------------------------
+            # Preserve the actual recording path.
+            # ----------------------------------------------------
+
+            context = AdapterContext(
+                adapter_name=adapter.adapter_name,
+                dataset_name=dataset_name,
+                subject_id=recording.subject_id,
+                recording_id=recording.recording_id,
+                dataset_path=dataset_path,
+                subject_path=subject_path,
+                recording_path=recording.recording_path,
+                layout=RecordingLayout.BIDS,
+                modality=recording.modality,
+                files=(recording.recording_path,),
+                metadata={
+                    **metadata,
+                },
+            )
+
+            self._logger.debug(
+                "Resolved adapter '%s' for recording '%s' "
+                "with layout=%s modality=%s",
+                adapter.adapter_name,
+                recording.recording_id,
+                context.layout.value,
+                context.modality.value,
+            )
+
+            return adapter, context
+
+        except FNIRSAdapterError:
+            raise
+
+        except Exception as exc:
+            raise FNIRSAdapterError(
+                f"Unable to select adapter for recording "
+                f"'{recording.recording_id}': {exc}"
+            ) from exc
 
     def _build_reader_kwargs(self, adapter: BaseAdapter, context: AdapterContext, recording: Recording) -> Dict[str, Any]:
         """Build adapter-aware keyword arguments for the MNE reader."""

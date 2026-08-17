@@ -1,0 +1,9 @@
+project:
+  name: "Neuro-Symphony"
+  version: "1.0"
+
+paths:
+  dataset_root: "~/Desktop/ds004514"
+  outputs_root: "outputs"
+  logs_root: "logs"
+  experiments_root: "experiments"

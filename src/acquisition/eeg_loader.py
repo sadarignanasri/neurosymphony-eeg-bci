@@ -224,23 +224,37 @@ class BaseEEGLoader(ABC):
             return reader(str(recording_path), **dict(kwargs))
         except Exception as exc:
             raise EEGReadError(f"Failed to read EEG file '{recording_path}': {exc}") from exc
-
     def _select_reader(self, recording_path: Path):
-        """Select an MNE reader for the file extension."""
+        """Select the correct MNE reader for the EEG file extension."""
+
         if mne is None:
             return None
 
         suffix = recording_path.suffix.lower()
+
         reader_map = {
+            # EDF / BDF
             ".edf": getattr(mne.io, "read_raw_edf", None),
-            ".bdf": getattr(mne.io, "read_raw_edf", None),
+            ".bdf": getattr(mne.io, "read_raw_bdf", None),
+
+            # FIF
             ".fif": getattr(mne.io, "read_raw_fif", None),
+
+            # BrainVision
             ".vhdr": getattr(mne.io, "read_raw_brainvision", None),
+
+            # Some datasets use .eeg alongside BrainVision header files.
             ".eeg": getattr(mne.io, "read_raw_brainvision", None),
+
+            # EEGLAB
             ".set": getattr(mne.io, "read_raw_eeglab", None),
+
+            # GDF
             ".gdf": getattr(mne.io, "read_raw_gdf", None),
         }
+
         return reader_map.get(suffix)
+
 
     def _build_standardized_data(
         self,

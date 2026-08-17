@@ -7,3 +7,5 @@ scikit-learn
 torch
 streamlit
 pyyaml
+
+h5py
