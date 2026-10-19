@@ -12,13 +12,22 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
-from src.acquisition.eeg_loader import EEGData
-from src.acquisition.fnirs_loader import FNIRSData
-from src.acquisition.recording import RecordingModality
-
-
+if TYPE_CHECKING:
+    from src.acquisition.eeg_loader import EEGData
+    from src.acquisition.fnirs_loader import FNIRSData
+    from src.acquisition.recording import RecordingModality
 class SynchronizationModality(str, Enum):
 	"""Supported synchronization modality groups."""
 

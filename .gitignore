@@ -76,3 +76,13 @@ datasets/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# NeuroSymphony datasets and generated results
+data/
+results/
+datasets/
+neuro_eeg_source.zip
+
+# NumPy arrays
+*.npy
+*.npz
