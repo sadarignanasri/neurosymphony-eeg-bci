@@ -1,11 +1,13 @@
 import os
 import sys
+from pathlib import Path
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.data.data_loader import DataLoader
 
 
 def main():
-    ds_root = r'F:/bci_project/data/raw/ds004514'
+    ds_root = Path(__file__).resolve().parents[1] / "data" / "raw" / "ds004514"
     loader = DataLoader(ds_root)
     loader.print_dataset_info('sub-01')
 

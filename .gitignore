@@ -1,3 +1,4 @@
+
 # ==========================================
 # Python
 # ==========================================
@@ -13,6 +14,7 @@ venv/
 env/
 ENV/
 .conda/
+bci_project/
 
 # ==========================================
 # IDE
@@ -36,12 +38,15 @@ logs/
 # ==========================================
 outputs/
 experiments/
+results/
 
 # ==========================================
 # Datasets
 # ==========================================
-data/raw/
+data/
 datasets/
+major datasets/
+neuro_eeg_source.zip
 
 # ==========================================
 # Brain Signal Files
@@ -56,7 +61,13 @@ datasets/
 *.fif
 
 # ==========================================
-# Models
+# NumPy Arrays
+# ==========================================
+*.npy
+*.npz
+
+# ==========================================
+# Model Artifacts
 # ==========================================
 *.pth
 *.pt
@@ -64,11 +75,25 @@ datasets/
 *.onnx
 *.h5
 *.keras
+*.joblib
+*.pkl
+*.pickle
+
+# ==========================================
+# Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+*.pem
+*.key
 
 # ==========================================
 # Reports
 # ==========================================
-*.pdf
+# Uncomment if you want to exclude all PDFs:
+# *.pdf
 
 # ==========================================
 # Operating System
@@ -76,13 +101,3 @@ datasets/
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# NeuroSymphony datasets and generated results
-data/
-results/
-datasets/
-neuro_eeg_source.zip
-
-# NumPy arrays
-*.npy
-*.npz
